@@ -1,4 +1,8 @@
 const Mutation = {
+    async createUser(parent, args, {db, Auth, info}){
+        
+    }
+    ,
     addBook(parent, args, {db, pubsub}, info){
         let books = db.books
         const id = books.length +1
@@ -9,6 +13,8 @@ const Mutation = {
         pubsub.publish(['book'], {getBook:book})
         return 'books added'
     }
+
+
 }
 
 module.exports = Mutation

@@ -1,6 +1,5 @@
 const Query = {
-    getBooks(parent, args, {db}, info){
-        console.log(db);
+    async getBooks(parent, args, {db,isAuth}, info){
         return db.books
     }
 }

@@ -7,7 +7,10 @@ const schema = gql`
 
     type Mutation{
         addBook(name:String, price:Int):String
+        createUser(email:String, password:String):String
     } 
+
+    
 
     type Subscription{
         getBook:Book
