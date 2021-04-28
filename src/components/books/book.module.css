@@ -1,0 +1,23 @@
+.book{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+    width: 60%;
+    margin: 10px auto;
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 2px 2px rgba(0, 0, 0, 0.26);
+}
+
+.price{
+    border: 2px solid black;
+    padding: 5px 2px;
+    border-radius: 4px;
+}
+
+.price:hover{
+    color: white;
+    background-color: black;
+}

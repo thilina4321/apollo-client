@@ -1,76 +1,90 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
+import Books from "./components/books/books";
 
-const users = gql`
-  query users {
-    users {
+const BOOKS = gql`
+  query getBooks {
+    getBooks {
       id
       name
-      age
+      price
     }
   }
 `;
 
-const userSubscription = gql`
-  subscription createUser {
-    users {
-      id
-      name
-      age
-    }
+const ADD_BOOK = gql`
+  mutation addBook($name:String, $price:Int){
+    addBook(name:$name, price:$price)
   }
 `;
 
-const NAME = gql`
-  query Name($a: String) {
-    name(a: $a) {
+const GET_BOOK = gql`
+  subscription getBook{
+    getBook{
       id
       name
-      age
+      price
     }
   }
-`;
-
-const CREATE_USER = gql`
-  mutation CreateUser($name: String, $age: Int) {
-    createUser(name: $name, age: $age) {
-      name
-      age
-      id
-    }
-  }
-`;
+`
 
 const App = () => {
-  const [datas, setData] = useState([]);
-  const { loading, error, data } = useQuery(users);
-  const [createUser, { data: userData }] = useMutation(CREATE_USER);
-  const { data: subData,  loading: subLoad } = useSubscription(userSubscription);
+  const {
+    loading: booksLoading,
+    error: booksError,
+    data: booksData,
+  } = useQuery(BOOKS);
+
+  const [
+    addBook,
+    { data: message, error: messageError, loading: messageLoading },
+  ] = useMutation(ADD_BOOK);
+  const [books, setBooks] = useState([]);
+
+  const {data:bookData} = useSubscription(GET_BOOK)
 
   useEffect(() => {
-    if (data) {
-      setData(data.users);
+    if (booksData) {
+      setBooks(booksData.getBooks);
     }
-  }, [data]);
+    
+  }, [booksData, bookData]);
 
-  useEffect(() => {
-    if (subData) {
-      setData((prev) => [...prev, subData.users]);
+  useEffect(()=>{
+    if(bookData){
+      setBooks(pre=> [...pre, {...bookData.getBook}] )
     }
-  }, [subData]);
+  }, [bookData])
 
-  const onCreateUser = () => {
-    createUser({ variables: { name: "thilina", age: 44 } });
-  };
+  const bookAddHandler = useCallback(
+    (data) => {
+      const { name, price } = data;
+      
+      addBook({variables:{name:name, price:+price}});
+      // if (messageError) {
+      //   console.log(messageError);
+      // }
+
+      console.log(message);
+    },
+    
+    [addBook, message]
+  );
+
+  console.log(bookData);
+
+  if (booksLoading) {
+    return <p> Loading.... </p>;
+  }
+
+  if (booksError) {
+    return <p> Sorry something went wrong...... </p>;
+  }
 
   return (
     <div>
-      <p> Thid id it </p>
-      {datas.map((da) => (
-        <p key={da.id}> {da.name} </p>
-      ))}
-      <button onClick={onCreateUser}> Click </button>
+      <Books books={books} bookAddHandler={bookAddHandler} />
     </div>
   );
 };
